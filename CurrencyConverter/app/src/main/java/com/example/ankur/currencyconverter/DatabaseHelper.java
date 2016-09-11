@@ -14,6 +14,8 @@ import java.util.ArrayList;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
+    private static DatabaseHelper sInstance = null;
+
     private static final String tablename = "recordInfo";  // tablename
     private static final String date = "date";  // column name
     private static final String id = "ID";  // auto generated ID column
@@ -22,6 +24,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String buyvalue = "buyvalue"; // column name
     private static final String databasename = "recordDb"; // Dtabasename
     private static final int versioncode = 1; //versioncode of the database
+
+    public static synchronized DatabaseHelper getInstance(Context context) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (sInstance == null) {
+            sInstance = new DatabaseHelper(context.getApplicationContext());
+        }
+        return sInstance;
+    }
 
     public DatabaseHelper(Context context) {
         super(context, databasename, null, versioncode);
@@ -84,8 +97,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean delete(RecordDetail recordId) {
 
         SQLiteDatabase db = getWritableDatabase();
-        Log.e("OutCome", recordId+"");
-        long r = db.delete(tablename, id+" =?", new String[]{recordId+""});
+        long r = db.delete(tablename, id+"=?", new String[]{recordId.getId()+""});
+        Log.e("OutCome", recordId.getId()+"");
         db.close();
         if(r != 1) return true;
         else return false;

@@ -2,36 +2,43 @@ package com.example.ankur.currencyconverter;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class BuyHistory extends AppCompatActivity {
+    private RecyclerView recordRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private ArrayList<RecordDetail> listArray = new ArrayList<>();
 
-    TextView recordInfoTv;
-    ListView listView;
-    ArrayList<RecordDetail> listArray = new ArrayList<>();
-    CustomBuyHistoryAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buy_history);
-        recordInfoTv = (TextView) findViewById(R.id.recordInfoTv);
-        listView = (ListView) findViewById(R.id.recordListView);
+        recordRecyclerView = (RecyclerView) findViewById(R.id.record_recycler_view);
+
+        recordRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        recordRecyclerView.setLayoutManager(mLayoutManager);
 
         try {
             DatabaseHelper dbHelper = new DatabaseHelper(this);
             listArray = dbHelper.getRecord();
-            adapter = new CustomBuyHistoryAdapter(this, listArray);
-            listView.setAdapter(adapter);
-            adapter.notifyDataSetChanged();
-           // String length = String.valueOf(listArray.size());
-           // recordInfoTv.setText(length + " record(s)");
+            mAdapter = new CustomBuyHistoryAdapter(this, listArray);
+            recordRecyclerView.setAdapter(mAdapter);
+
 
         } catch (Exception ex) {
-            recordInfoTv.setText(ex.getMessage().toString());
+            Toast.makeText(BuyHistory.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+
         }
 
     }
